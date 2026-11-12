@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="logo.png"><link rel="apple-touch-icon" href="logo.png">
 <title>FINZA · tus finanzas, en tus manos</title>
 <meta name="description" content="FINZA: app para Android que ordena tus cuentas, movimientos, metas y presupuestos. Tus datos quedan en tu teléfono.">
 <style>
@@ -15,7 +16,7 @@ background:radial-gradient(900px 520px at -10% -10%,rgba(20,184,166,.28),transpa
 .hero{padding:34px 24px;border-radius:30px;background:linear-gradient(135deg,#0f766e,#1e3a8a 60%,#4338ca);color:#fff;text-align:center;box-shadow:0 18px 40px rgba(15,23,42,.22);position:relative;overflow:hidden}
 .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.08)}
 .hero:before{width:240px;height:240px;right:-70px;top:-70px}.hero:after{width:160px;height:160px;left:-50px;bottom:-60px}
-.logo{width:84px;height:84px;margin:0 auto 12px;border-radius:24px;display:grid;place-items:center;font-weight:900;font-size:42px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35)}
+.logo{width:84px;height:84px;margin:0 auto 12px;border-radius:24px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.35)}
 .hero h1{margin:0;font-size:34px}.hero p{margin:6px 0 0;opacity:.92;font-size:17px}
 .btn{display:inline-block;margin:16px 6px 0;padding:13px 20px;border-radius:16px;text-decoration:none;font-weight:750;background:#fff;color:#0f766e}
 .btn.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4)}
@@ -28,7 +29,7 @@ background:radial-gradient(900px 520px at -10% -10%,rgba(20,184,166,.28),transpa
 <body>
 <div class="wrap">
   <header class="hero">
-    <div class="logo">F</div>
+    <div class="logo"><img src="logo.png" alt="FINZA" style="width:100%;height:100%;border-radius:inherit;display:block;object-fit:cover"></div>
     <h1>FINZA</h1>
     <p>Tus finanzas, en tus manos. Ordena cuentas, movimientos, metas y presupuestos en un solo lugar.</p>
     <a class="btn" href="https://github.com/appfinza/finza/releases/latest">⬇️ Descargar para Android</a>
