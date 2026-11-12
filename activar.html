@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Activar FINZA Premium</title>
+<style>
+:root{--bg:#eef6f6;--card:rgba(255,255,255,.85);--text:#0f172a;--muted:#64748b;--line:rgba(15,23,42,.1);--teal:#0f766e;--teal2:#14b8a6}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:rgba(30,41,59,.85);--text:#e2e8f0;--muted:#94a3b8;--line:rgba(148,163,184,.2);--teal:#2dd4bf;--teal2:#14b8a6}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;font:16px/1.5 system-ui,"Segoe UI",Roboto,sans-serif;color:var(--text);
+background:radial-gradient(700px 400px at 0 0,rgba(20,184,166,.25),transparent 60%),radial-gradient(700px 400px at 100% 100%,rgba(99,102,241,.2),transparent 60%),var(--bg)}
+.card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:26px 20px;text-align:center;box-shadow:0 14px 40px rgba(15,23,42,.12)}
+.logo{width:64px;height:64px;margin:0 auto 10px;border-radius:18px;display:grid;place-items:center;font-weight:900;font-size:30px;color:#fff;background:linear-gradient(135deg,#0f766e,#6366f1)}
+h1{font-size:22px;margin:6px 0}
+p{color:var(--muted);margin:8px 0}
+.btn{display:block;width:100%;padding:14px;border-radius:16px;border:0;font:inherit;font-weight:750;cursor:pointer;text-decoration:none;margin-top:12px}
+.primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff}
+.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;word-break:break-all;text-align:left;padding:12px;border-radius:12px;border:1px dashed var(--teal);margin-top:14px}
+.steps{text-align:left;color:var(--muted);font-size:14px;padding-left:20px}
+.err{color:#be123c}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="logo">F</div>
+  <h1>Activar FINZA Premium</h1>
+  <div id="ok" hidden>
+    <p>Toca el botón para abrir FINZA en este teléfono. El código se activa solo.</p>
+    <a class="btn primary" id="open" href="#">✨ Abrir FINZA y activar</a>
+    <button class="btn ghost" id="copy" type="button">Copiar código</button>
+    <div class="code" id="code"></div>
+    <p style="font-size:13.5px;margin-top:14px">¿No se abrió? Copia el código y en FINZA toca:</p>
+    <ol class="steps"><li>“Ya pagué: ingresar código”</li><li>“Pegar código”</li><li>“Activar Premium”</li></ol>
+  </div>
+  <p id="bad" class="err" hidden>Este enlace no trae un código. Revisa el correo de FINZA o escríbenos a contactofinza@gmail.com.</p>
+  <p style="font-size:12.5px;margin-top:16px">FINZA · <a href="https://github.com/appfinza/finza/releases/latest" style="color:inherit">Descargar la app</a></p>
+</main>
+<script>
+// El codigo viene despues de "#c=" (la parte tras # no se envia a ningun servidor). Solo se usa para abrir FINZA.
+(function(){
+  var m=/[#&]c=([A-Za-z0-9._-]+)/.exec(location.hash||"");
+  if(!m){document.getElementById("bad").hidden=false;return;}
+  var code=m[1];
+  document.getElementById("ok").hidden=false;
+  document.getElementById("code").textContent=code;
+  var android=/Android/i.test(navigator.userAgent);
+  var fallback=encodeURIComponent("https://github.com/appfinza/finza/releases/latest");
+  var href=android?"intent://activar?c="+encodeURIComponent(code)+"#Intent;scheme=finza;package=com.kjota.finza;S.browser_fallback_url="+fallback+";end"
+                  :"finza://activar?c="+encodeURIComponent(code);
+  var a=document.getElementById("open");a.href=href;
+  document.getElementById("copy").onclick=function(){
+    var done=function(){document.getElementById("copy").textContent="✓ Código copiado";};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,function(){});
+    else{var t=document.createElement("textarea");t.value=code;document.body.appendChild(t);t.select();try{document.execCommand("copy");done();}catch(e){}t.remove();}
+  };
+  if(android)setTimeout(function(){location.href=href;},600);
+})();
+</script>
+</body>
+</html>
