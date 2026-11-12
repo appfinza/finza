@@ -36,13 +36,13 @@ h1{font-size:21px;margin:6px 0}p{color:var(--muted);margin:8px 0}
 (function(){
   var h=location.hash.replace(/^#/,""),p={};
   h.split("&").forEach(function(kv){var i=kv.indexOf("=");if(i>0)p[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));});
-  var id=p.id||"",v=p.v||"";
+  var id=p.id||"",v=p.v||"",u=(p.u||"").slice(0,1500);
   if(!/^FZ-?[A-Z0-9]{4}-?[A-Z0-9]{4}$/i.test(id)){document.getElementById("bad").hidden=false;return;}
   if(!/^[0-9A-Za-z.\-]{0,30}$/.test(v))v="";
   document.getElementById("ok").hidden=false;
-  var text="ID de instalación: "+id+"\nVersión de FINZA: "+(v||"—");
+  var text="ID de instalación: "+id+"\nVersión de FINZA: "+(v||"—")+(u?"\n\nResumen de uso:\n"+u:"");
   document.getElementById("data").textContent=text;
-  var href="finzaadmin://abrir?id="+encodeURIComponent(id)+"&v="+encodeURIComponent(v);
+  var href="finzaadmin://abrir?id="+encodeURIComponent(id)+"&v="+encodeURIComponent(v)+(u?"&u="+encodeURIComponent(u):"");
   document.getElementById("open").href=href;
   document.getElementById("copy").onclick=function(){
     var b=document.getElementById("copy");
