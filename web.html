@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="logo.png"><link rel="apple-touch-icon" href="logo.png">
+<meta name="robots" content="noindex">
+<title>FINZA web</title>
+<style>
+:root{--bg:#eef6f6;--card:rgba(255,255,255,.88);--text:#0f172a;--muted:#64748b;--line:rgba(15,23,42,.1);--teal:#0f766e;--teal2:#14b8a6;--red:#dc2626;--green:#059669;--soft:rgba(20,184,166,.12)}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:rgba(30,41,59,.88);--text:#e2e8f0;--muted:#94a3b8;--line:rgba(148,163,184,.2);--teal:#2dd4bf;--teal2:#14b8a6;--red:#f87171;--green:#34d399;--soft:rgba(45,212,191,.12)}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font:15px/1.5 system-ui,"Segoe UI",Roboto,sans-serif;color:var(--text);
+background:radial-gradient(800px 420px at 0 0,rgba(20,184,166,.22),transparent 60%),radial-gradient(800px 420px at 100% 100%,rgba(99,102,241,.16),transparent 60%),var(--bg);background-attachment:fixed}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+header img{width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(15,23,42,.18)}
+header h1{font-size:20px;margin:0}header .ro{font-size:12px;color:var(--muted)}
+header .sp{flex:1}
+select,input,button{font:inherit;color:inherit}
+select,input[type=search]{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:750;cursor:pointer;text-decoration:none;display:inline-block}
+.primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff}.ghost{background:transparent;border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(15,23,42,.08)}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:3fr 2fr}
+@media (max-width:860px){.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+.kpi small{color:var(--muted);display:block}.kpi b{font-size:22px;display:block;margin-top:2px;font-variant-numeric:tabular-nums}
+.hero{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;border:0}.hero small{color:rgba(255,255,255,.85)}
+h2{font-size:15px;margin:0 0 10px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+.row span:last-child{font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}
+.bar{height:8px;border-radius:99px;background:var(--soft);margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:inherit}
+table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:650}
+.in{color:var(--green)}.out{color:var(--red)}.muted{color:var(--muted)}
+.tablewrap{overflow-x:auto}
+.center{max-width:460px;margin:8vh auto 0;text-align:center}
+.center img{width:72px;height:72px;border-radius:20px;box-shadow:0 10px 24px rgba(15,23,42,.2)}
+.center p{color:var(--muted)}
+.err{color:var(--red);font-size:14px}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--teal);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+ <div class="center card" id="login">
+  <img src="logo.png" alt="FINZA">
+  <h1>FINZA web</h1>
+  <p>Mira tus finanzas en el computador. FINZA web lee tu último respaldo de Google Drive y <b>no cambia nada</b>: todo se edita en el teléfono.</p>
+  <button class="btn primary" id="signin" type="button">Entrar con Google</button>
+  <p style="font-size:13px">Necesitas FINZA Premium con el respaldo en Google Drive activado. FINZA solo puede ver los archivos que creó la app, nada más de tu Drive.</p>
+  <p id="hint" style="font-size:13px"></p>
+  <p class="err" id="err"></p>
+  <div id="fileWrap" hidden><label class="btn ghost">Abrir archivo de respaldo<input type="file" id="file" accept=".json,application/json" hidden></label></div>
+ </div>
+ <div id="dash" hidden></div>
+</div>
+<script>
+// Cliente OAuth "web" del proyecto de FINZA (mismo proyecto que la app: drive.file ve los respaldos que subio el telefono).
+var CLIENT_ID="146664946361-94ovt2oq5drbp2ihsu2uocjmrq19noeh.apps.googleusercontent.com";
+var SCOPE="https://www.googleapis.com/auth/drive.file";
+var S=null,P=null,YM="",Q="",FILE_NAME="";
+var INCOME={salary:"Sueldo",freelance:"Honorarios",sale:"Venta",transfer_in:"Transferencia recibida",refund:"Devolución",bonus:"Bonificación",interest:"Intereses",gift_income:"Regalo recibido",other_income:"Otro ingreso"};
+var EXPENSE={alimentacion:"Alimentación",hogar:"Hogar",transporte:"Transporte",combustible:"Combustible",salud:"Salud",entretenimiento:"Entretenimiento",educacion:"Educación",suscripciones:"Suscripciones",compras:"Compras",ropa:"Ropa",mascotas:"Mascotas",servicios:"Servicios básicos",deudas:"Pago de deuda",viajes:"Viajes",cigarros:"Cigarros",otros:"Otros",transfer_internal:"Transferencia entre cuentas"};
+var METHOD={cash:"Efectivo",transfer:"Transferencia",debit:"Débito",credit:"Crédito"};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function money(n){n=Math.round(Number(n)||0);return (n<0?"-$":"$")+Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+function catLabel(code){
+ code=String(code||"");if(INCOME[code])return INCOME[code];if(EXPENSE[code])return EXPENSE[code];
+ var c=P&&P.customCategories||{};var all=[].concat(c.income||[],c.expense||[],P&&P.budgetCustomCategories||[]);
+ for(var i=0;i<all.length;i++)if(String(all[i].id)===code&&all[i].name)return all[i].name;
+ if(code.indexOf("custom_")===0){var b=code.slice(7).replace(/_[a-z0-9]{6,14}$/i,"").replace(/_/g," ");return b.charAt(0).toUpperCase()+b.slice(1)}
+ return code||"Sin categoría";
+}
+function accName(id){var a=(P.accounts||[]).find(function(x){return x.id===id});return a?(a.name||a.bank||"Cuenta"):""}
+function monthName(ym){var d=new Date(ym+"-15T12:00:00");var s=d.toLocaleDateString("es-CL",{month:"long",year:"numeric"});return s.charAt(0).toUpperCase()+s.slice(1)}
+function isTransfer(m){return m.type==="transfer"||m.category==="transfer_internal"||(m.method==="transfer"&&m.toAccountId&&m.accountId!==m.toAccountId)}
+
+function load(state,name){
+ if(!state||typeof state!=="object"||!state.profiles){$("err").textContent="Ese archivo no es un respaldo de FINZA.";return}
+ S=state;FILE_NAME=name||"";
+ var keys=Object.keys(S.profiles).filter(function(k){var p=S.profiles[k];return p&&((p.movements||[]).length||(p.accounts||[]).length)});
+ if(!keys.length)keys=Object.keys(S.profiles);
+ var act=S.active&&S.profiles[S.active]&&keys.indexOf(S.active)>=0?S.active:keys[0];
+ P=S.profiles[act];P.__key=act;
+ var yms=(P.movements||[]).map(function(m){return (m.date||"").slice(0,7)}).filter(Boolean).sort();
+ var now=new Date().toISOString().slice(0,7);
+ YM=yms.indexOf(now)>=0||!yms.length?now:yms[yms.length-1];
+ $("login").hidden=true;$("dash").hidden=false;render();
+}
+function render(){
+ var keys=Object.keys(S.profiles);
+ var allMs=(P.movements||[]).filter(function(m){return m&&m.date});
+ var yms=allMs.map(function(m){return m.date.slice(0,7)});yms.push(YM);
+ yms=yms.filter(function(v,i,a){return a.indexOf(v)===i}).sort().reverse();
+ var ms=allMs.filter(function(m){return m.date.slice(0,7)===YM&&!isTransfer(m)});
+ var inc=0,exp=0,cats={};
+ ms.forEach(function(m){var a=Number(m.amount||0);if(m.type==="income")inc+=a;else if(m.type==="expense"){exp+=a;var c=catLabel(m.category);cats[c]=(cats[c]||0)+a}});
+ var avail=(P.accounts||[]).reduce(function(s,a){return s+Number(a.balance||0)},0);
+ var bills=(P.bills||[]).filter(function(b){return !b.paid});
+ var billsSum=bills.reduce(function(s,b){return s+Number(b.amount||0)},0);
+ var catList=Object.keys(cats).map(function(k){return [k,cats[k]]}).sort(function(a,b){return b[1]-a[1]});
+ var top=catList.length?catList[0][1]:1;
+ var list=(Q?allMs:allMs.filter(function(m){return m.date.slice(0,7)===YM}))
+  .filter(function(m){if(!Q)return true;var t=(m.description+" "+m.merchant+" "+catLabel(m.category)+" "+m.amount).toLowerCase();return t.indexOf(Q.toLowerCase())>=0})
+  .sort(function(a,b){return (b.date+(b.time||"")).localeCompare(a.date+(a.time||""))}).slice(0,400);
+ var goals=(P.goals||[]).filter(function(g){return g&&Number(g.target||0)>0});
+ var h='<header><img src="logo.png" alt=""><div><h1>FINZA web</h1><div class="ro">Solo lectura'+(FILE_NAME?' · '+esc(FILE_NAME):'')+'</div></div><span class="sp"></span>'
+  +(keys.length>1?'<select id="prof">'+keys.map(function(k){var p=S.profiles[k];return '<option value="'+esc(k)+'"'+(k===P.__key?' selected':'')+'>'+esc(p.name||(k==="guest"?"Invitado":k))+'</option>'}).join("")+'</select>':'')
+  +'<select id="ym">'+yms.map(function(y){return '<option value="'+y+'"'+(y===YM?' selected':'')+'>'+monthName(y)+'</option>'}).join("")+'</select>'
+  +'<button class="btn ghost" id="out" type="button">Salir</button></header>';
+ h+='<div class="grid g4"><div class="card kpi hero"><small>Dinero disponible</small><b>'+money(avail)+'</b></div>'
+  +'<div class="card kpi"><small>Ingresos de '+esc(monthName(YM).split(" ")[0].toLowerCase())+'</small><b class="in">'+money(inc)+'</b></div>'
+  +'<div class="card kpi"><small>Gastos de '+esc(monthName(YM).split(" ")[0].toLowerCase())+'</small><b class="out">'+money(exp)+'</b></div>'
+  +'<div class="card kpi"><small>Cuentas por pagar</small><b>'+money(billsSum)+'</b></div></div>';
+ h+='<div class="grid g2" style="margin-top:14px"><div class="card"><h2>Gastos por categoría</h2>'
+  +(catList.length?catList.map(function(c){return '<div style="margin:8px 0"><div class="row" style="border:0;padding:0"><span>'+esc(c[0])+'</span><span>'+money(c[1])+'</span></div><div class="bar"><i style="width:'+Math.max(3,Math.round(c[1]/top*100))+'%"></i></div></div>'}).join(""):'<p class="muted">Sin gastos este mes.</p>')
+  +'</div><div class="grid" style="align-content:start"><div class="card"><h2>Cuentas</h2>'
+  +((P.accounts||[]).length?(P.accounts||[]).map(function(a){return '<div class="row"><span>'+esc(a.name||a.bank||"Cuenta")+(a.bank&&a.name&&a.bank!==a.name?' <span class="muted">· '+esc(a.bank)+'</span>':'')+'</span><span>'+money(a.balance)+'</span></div>'}).join(""):'<p class="muted">Sin cuentas.</p>')
+  +'</div>'+(bills.length?'<div class="card"><h2>Por pagar</h2>'+bills.slice(0,8).map(function(b){return '<div class="row"><span>'+esc(b.name||b.description||"Cuenta")+(b.due?' <span class="muted">· vence '+esc(String(b.due).split("-").reverse().join("/"))+'</span>':'')+'</span><span>'+money(b.amount)+'</span></div>'}).join("")+'</div>':'')
+  +(goals.length?'<div class="card"><h2>Metas</h2>'+goals.map(function(g){var pc=Math.min(100,Math.round(Number(g.saved||g.current||0)/Number(g.target)*100));return '<div style="margin:8px 0"><div class="row" style="border:0;padding:0"><span>'+esc(g.name||"Meta")+'</span><span>'+pc+'%</span></div><div class="bar"><i style="width:'+pc+'%"></i></div></div>'}).join("")+'</div>':'')
+  +'</div></div>';
+ h+='<div class="card" style="margin-top:14px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><h2 style="margin:0;flex:1">Movimientos'+(Q?' (todos los meses)':' de '+esc(monthName(YM)))+'</h2><input type="search" id="q" placeholder="Buscar…" value="'+esc(Q)+'"></div><div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Detalle</th><th>Categoría</th><th>Cuenta</th><th style="text-align:right">Monto</th></tr></thead><tbody>'
+  +(list.length?list.map(function(m){var t=isTransfer(m)?"":m.type==="income"?"in":"out";var sign=m.type==="income"?"+":m.type==="expense"?"-":"";
+    return '<tr><td>'+esc(m.date.split("-").reverse().join("/"))+'</td><td>'+esc(m.description||m.merchant||"—")+(m.merchant&&m.description&&m.merchant!==m.description?'<div class="muted" style="font-size:12px">'+esc(m.merchant)+'</div>':'')+(Number(m.installments||1)>1?' <span class="tag">'+Number(m.installments)+' cuotas</span>':'')+'</td><td>'+esc(isTransfer(m)?"Transferencia":catLabel(m.category))+'</td><td>'+esc(accName(m.accountId)||METHOD[m.method]||"")+'</td><td class="n '+t+'">'+sign+money(m.amount).replace("-","")+'</td></tr>'}).join(""):'<tr><td colspan="5" class="muted">No hay movimientos.</td></tr>')
+  +'</tbody></table></div></div>';
+ h+='<p class="muted" style="text-align:center;font-size:12px;margin-top:18px">FINZA web solo muestra tu información; para cambiar algo usa la app en tu teléfono.</p>';
+ $("dash").innerHTML=h;
+ $("ym").onchange=function(){YM=this.value;Q="";render()};
+ if($("prof"))$("prof").onchange=function(){P=S.profiles[this.value];P.__key=this.value;render()};
+ $("out").onclick=function(){try{if(TOKEN&&window.google)google.accounts.oauth2.revoke(TOKEN,function(){})}catch(e){}TOKEN="";S=P=null;$("dash").hidden=true;$("login").hidden=false;$("dash").innerHTML=""};
+ var qt=null;$("q").oninput=function(){var v=this.value;clearTimeout(qt);qt=setTimeout(function(){Q=v.trim();render();var el=$("q");el.focus();el.setSelectionRange(el.value.length,el.value.length)},250)};
+}
+
+// ---------------------------------------------------------------- Google Drive (solo lectura de los respaldos de FINZA)
+var TOKEN="",tokenClient=null;
+function api(path){return fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+TOKEN}}).then(function(r){if(!r.ok)throw new Error("drive "+r.status);return r})}
+function fromDrive(){
+ $("err").textContent="";$("hint").textContent="Buscando tu último respaldo…";
+ var q=encodeURIComponent("name='FINZA' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+ api("files?spaces=drive&fields=files(id)&q="+q).then(function(r){return r.json()}).then(function(j){
+  if(!j.files||!j.files.length)throw new Error("nofolder");
+  var q2=encodeURIComponent("'"+j.files[0].id+"' in parents and trashed=false and mimeType='application/json'");
+  return api("files?spaces=drive&pageSize=1&orderBy=createdTime%20desc&fields=files(id,name,createdTime)&q="+q2);
+ }).then(function(r){return r.json()}).then(function(j){
+  if(!j.files||!j.files.length)throw new Error("nofolder");
+  var f=j.files[0];
+  return api("files/"+f.id+"?alt=media").then(function(r){return r.json()}).then(function(st){$("hint").textContent="";load(st,"respaldo del "+new Date(f.createdTime).toLocaleString("es-CL",{dateStyle:"medium",timeStyle:"short"}))});
+ }).catch(function(e){$("hint").textContent="";
+  $("err").textContent=String(e.message)==="nofolder"?"No encontré respaldos de FINZA en tu Drive. En el teléfono: Ajustes → Respaldo en Google Drive → Respaldar ahora.":"No pude leer tu Drive. Vuelve a intentarlo.";});
+}
+$("signin").onclick=function(){
+ if(CLIENT_ID.indexOf(".apps.googleusercontent.com")<0){$("err").textContent="FINZA web aún no está activado.";return}
+ if(!window.google||!google.accounts){$("err").textContent="Cargando Google… prueba de nuevo en un segundo.";return}
+ if(!tokenClient)tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:function(t){if(t&&t.access_token){TOKEN=t.access_token;fromDrive()}else $("err").textContent="No se pudo entrar con Google."}});
+ tokenClient.requestAccessToken({prompt:""});
+};
+// Respaldo descargado (para revisar sin Drive): finza…/web.html#archivo
+if(location.hash==="#archivo")$("fileWrap").hidden=false;
+$("file").onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{load(JSON.parse(r.result),f.name)}catch(e){$("err").textContent="Ese archivo no es un respaldo de FINZA."}};r.readAsText(f)};
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;document.head.appendChild(s)})();
+</script>
+</body>
+</html>
