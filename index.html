@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FINZA · tus finanzas, en tus manos</title>
+<meta name="description" content="FINZA: app para Android que ordena tus cuentas, movimientos, metas y presupuestos. Tus datos quedan en tu teléfono.">
+<style>
+:root{--bg:#eef6f6;--card:rgba(255,255,255,.78);--line:rgba(15,23,42,.08);--text:#0f172a;--muted:#5b6b80;--teal:#0f766e;--teal2:#14b8a6}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:rgba(30,41,59,.72);--line:rgba(148,163,184,.16);--text:#e2e8f0;--muted:#9fb0c6;--teal:#2dd4bf;--teal2:#14b8a6}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 system-ui,"Segoe UI",Roboto,sans-serif;color:var(--text);min-height:100vh;
+background:radial-gradient(900px 520px at -10% -10%,rgba(20,184,166,.28),transparent 60%),radial-gradient(800px 520px at 110% 0,rgba(99,102,241,.22),transparent 60%),var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 60px}
+.hero{padding:34px 24px;border-radius:30px;background:linear-gradient(135deg,#0f766e,#1e3a8a 60%,#4338ca);color:#fff;text-align:center;box-shadow:0 18px 40px rgba(15,23,42,.22);position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero:before{width:240px;height:240px;right:-70px;top:-70px}.hero:after{width:160px;height:160px;left:-50px;bottom:-60px}
+.logo{width:84px;height:84px;margin:0 auto 12px;border-radius:24px;display:grid;place-items:center;font-weight:900;font-size:42px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35)}
+.hero h1{margin:0;font-size:34px}.hero p{margin:6px 0 0;opacity:.92;font-size:17px}
+.btn{display:inline-block;margin:16px 6px 0;padding:13px 20px;border-radius:16px;text-decoration:none;font-weight:750;background:#fff;color:#0f766e}
+.btn.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
+.card{padding:18px;border-radius:22px;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px)}
+.card .i{font-size:26px}.card b{display:block;margin-top:6px}.card span{color:var(--muted);font-size:14.5px}
+.foot{margin-top:24px;text-align:center;color:var(--muted);font-size:14px}.foot a{color:var(--teal);margin:0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="logo">F</div>
+    <h1>FINZA</h1>
+    <p>Tus finanzas, en tus manos. Ordena cuentas, movimientos, metas y presupuestos en un solo lugar.</p>
+    <a class="btn" href="https://github.com/appfinza/finza/releases/latest">⬇️ Descargar para Android</a>
+    <a class="btn ghost" href="privacidad.html">🔒 Privacidad</a>
+  </header>
+  <section class="grid">
+    <div class="card"><div class="i">🔔</div><b>Detecta tus gastos</b><span>Lee los avisos de tu banco y te propone cada movimiento.</span></div>
+    <div class="card"><div class="i">🎯</div><b>Metas y presupuestos</b><span>Ve cómo se llena tu meta y recibe alertas antes de pasarte.</span></div>
+    <div class="card"><div class="i">💳</div><b>Tus cuentas, claras</b><span>Tarjetas con el color y logo de cada banco, y cuentas por pagar con días restantes.</span></div>
+    <div class="card"><div class="i">☁️</div><b>Respaldo en tu Drive</b><span>Con Premium, tus datos se guardan solos en tu Google Drive.</span></div>
+    <div class="card"><div class="i">📱</div><b>Privada por diseño</b><span>Tus datos quedan en tu teléfono. Sin publicidad ni rastreadores.</span></div>
+    <div class="card"><div class="i">✨</div><b>Premium a $2.000/mes</b><span>Cartolas PDF, informes, reglas automáticas, perfiles y más.</span></div>
+  </section>
+  <div class="foot">
+    <a href="mailto:contactofinza@gmail.com">contactofinza@gmail.com</a>·<a href="https://www.instagram.com/appfinza/">@appfinza</a>·<a href="privacidad.html">Política de privacidad</a>
+    <p>© 2026 FINZA</p>
+  </div>
+</div>
+</body>
+</html>
