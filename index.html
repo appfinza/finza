@@ -32,7 +32,7 @@ background:radial-gradient(900px 520px at -10% -10%,rgba(20,184,166,.28),transpa
     <div class="logo"><img src="logo.png" alt="FINZA" style="width:100%;height:100%;border-radius:inherit;display:block;object-fit:cover"></div>
     <h1>FINZA</h1>
     <p>Tus finanzas, en tus manos. Ordena cuentas, movimientos, metas y presupuestos en un solo lugar.</p>
-    <a class="btn" href="https://github.com/appfinza/finza/releases/latest">⬇️ Descargar para Android</a>
+    <a class="btn" id="dl" href="https://github.com/appfinza/finza/releases/latest">⬇️ Descargar para Android</a>
     <a class="btn ghost" href="privacidad.html">🔒 Privacidad</a>
   </header>
   <section class="grid">
@@ -48,5 +48,13 @@ background:radial-gradient(900px 520px at -10% -10%,rgba(20,184,166,.28),transpa
     <p>© 2026 FINZA</p>
   </div>
 </div>
+<script>
+/* Conteo anonimo de descargas (sin datos personales): cuenta el toque en Descargar y el origen (?ref=fb, ig...). */
+(function(){var R="https://script.google.com/macros/s/AKfycbz1uZ2JSEbHc2-Lr2yKa2167tVqQX7-XRVFpiF2VUpLtxkiJt43MAUjxr2JxykQvqV5JA/exec";
+var ref=(new URLSearchParams(location.search).get("ref")||"").toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,24);
+if(!ref){try{var h=document.referrer?new URL(document.referrer).hostname:"";ref=/facebook|fb\./.test(h)?"fb":/instagram/.test(h)?"ig":/whatsapp|wa\.me/.test(h)?"wa":/google\./.test(h)?"google":h?"otro":"directo"}catch(e){ref="directo"}}
+document.getElementById("dl").addEventListener("click",function(){try{var b=JSON.stringify({token:"finza-relay-v1",kind:"download",ref:ref});
+if(!(navigator.sendBeacon&&navigator.sendBeacon(R,new Blob([b],{type:"text/plain"}))))fetch(R,{method:"POST",mode:"no-cors",body:b,keepalive:true})}catch(e){}});})();
+</script>
 </body>
 </html>
